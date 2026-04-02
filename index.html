@@ -389,6 +389,34 @@
   .sheet-status.connected .dot { background:#1db954; }
   .sheet-status.connected { color:rgba(255,255,255,0.7); }
 
+  /* INFO FIELDS */
+  .info-fields { display:flex; flex-direction:column; gap:20px; max-width:560px; margin-bottom:40px; }
+  .info-field { display:flex; flex-direction:column; gap:8px; }
+  .info-label {
+    font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
+    color:rgba(255,255,255,0.45);
+  }
+  .info-input {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14);
+    border-radius:6px; padding:14px 18px;
+    color:#fff; font-family:'DM Sans',sans-serif; font-size:15px;
+    outline:none; transition:border-color 0.2s;
+  }
+  .info-input:focus { border-color:rgba(255,255,255,0.4); }
+  .info-input::placeholder { color:rgba(255,255,255,0.2); }
+  .info-input.error { border-color:var(--accent) !important; }
+  .info-select {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14);
+    border-radius:6px; padding:14px 18px;
+    color:#fff; font-family:'DM Sans',sans-serif; font-size:15px;
+    outline:none; transition:border-color 0.2s;
+    appearance:none; cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 16px center;
+  }
+  .info-select:focus { border-color:rgba(255,255,255,0.4); }
+  .info-select option { background:#1a1a22; color:#fff; }
+
   @media(max-width:640px){
     .topbar,.hero-content,.hero-bottom,.survey-header,
     .step,.intro-step,.dash-header,.dash-content { padding-left:24px; padding-right:24px; }
@@ -482,7 +510,42 @@
         <div class="chip">🎯 <span>Phần 2</span> Nội dung 3 buổi</div>
         <div class="chip">🏛️ <span>Phần 3</span> Design Hub</div>
       </div>
-      <button class="btn-next" onclick="goToStep(0)">Bắt đầu →</button>
+      <button class="btn-next" onclick="goToInfoStep()">Bắt đầu →</button>
+    </div>
+
+    <!-- INFO: Thông tin cá nhân -->
+    <div class="step" id="step-info">
+      <div class="step-number">Thông tin · Trước khi bắt đầu</div>
+      <div class="step-q">Thầy/Cô vui lòng điền thông tin để BTC liên hệ khi cần.</div>
+      <div class="step-hint">Thông tin chỉ dùng nội bộ, không chia sẻ ra ngoài</div>
+      <div class="info-fields">
+        <div class="info-field">
+          <label class="info-label" for="info-name">Họ và tên <span style="color:var(--accent)">*</span></label>
+          <input class="info-input" id="info-name" type="text" placeholder="Nguyễn Văn A" autocomplete="name"/>
+        </div>
+        <div class="info-field">
+          <label class="info-label" for="info-email">Email <span style="color:var(--accent)">*</span></label>
+          <input class="info-input" id="info-email" type="email" placeholder="email@truong.edu.vn" autocomplete="email"/>
+        </div>
+        <div class="info-field">
+          <label class="info-label" for="info-major">Chuyên ngành giảng dạy <span style="color:var(--accent)">*</span></label>
+          <select class="info-select" id="info-major">
+            <option value="" disabled selected>— Chọn chuyên ngành —</option>
+            <option value="Thiết kế Đồ họa">Thiết kế Đồ họa</option>
+            <option value="Thiết kế Thời trang">Thiết kế Thời trang</option>
+            <option value="Thiết kế Nội thất">Thiết kế Nội thất</option>
+            <option value="Thiết kế Công nghiệp">Thiết kế Công nghiệp</option>
+            <option value="Nhiếp ảnh">Nhiếp ảnh</option>
+            <option value="Mỹ thuật Ứng dụng">Mỹ thuật Ứng dụng</option>
+            <option value="Kiến trúc">Kiến trúc</option>
+            <option value="Khác">Khác</option>
+          </select>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="showIntro()">← Quay lại</button>
+        <button class="btn-next" onclick="validateInfoAndProceed()">Tiếp theo →</button>
+      </div>
     </div>
 
     <!-- Q1: Tools used -->
@@ -706,14 +769,14 @@
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  BƯỚC DUY NHẤT BẠN CẦN CHỈNH: dán URL Apps Script vào đây ║
 // ╚══════════════════════════════════════════════════════════════╝
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYxEd5zpzRm8Y1x-t6oOAnzF0LLdzt_URuZLgUEHlSQcgHjUQgKtqdfeymWbbUGGvj/exec';
+const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
 // Ví dụ: 'https://script.google.com/macros/s/AKfycbxxxxxxxx/exec'
 
 // ──────────────────────────────────────────────────────────────
 const isConfigured = () => APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('PASTE_YOUR');
 
 // ── ANSWER STATE ───────────────────────────────────────────────
-let answers = { q0:[], q1:'', q2:[], q3:'', q4:'', q5:[], q6:'' };
+let answers = { name:'', email:'', major:'', q0:[], q1:'', q2:[], q3:'', q4:'', q5:[], q6:'' };
 let currentStep = -1;
 const TOTAL_STEPS = 7;
 
@@ -730,7 +793,7 @@ function showPage(id) {
 }
 
 function startSurvey() {
-  answers = { q0:[], q1:'', q2:[], q3:'', q4:'', q5:[], q6:'' };
+  answers = { name:'', email:'', major:'', q0:[], q1:'', q2:[], q3:'', q4:'', q5:[], q6:'' };
   currentStep = -1;
   showPage('surveyPage');
   showIntro();
@@ -742,8 +805,32 @@ function showIntro() {
   updateProgress(-1);
 }
 
+function goToInfoStep() {
+  hideAllSteps();
+  document.getElementById('step-info').classList.add('active');
+  updateProgress(-1);
+  window.scrollTo(0,0);
+}
+
+function validateInfoAndProceed() {
+  const name  = document.getElementById('info-name').value.trim();
+  const email = document.getElementById('info-email').value.trim();
+  const major = document.getElementById('info-major').value;
+  let ok = true;
+  ['info-name','info-email','info-major'].forEach(id => document.getElementById(id).classList.remove('error'));
+  if (!name)  { document.getElementById('info-name').classList.add('error'); ok = false; }
+  if (!email || !email.includes('@')) { document.getElementById('info-email').classList.add('error'); ok = false; }
+  if (!major) { document.getElementById('info-major').classList.add('error'); ok = false; }
+  if (!ok) { showToast('Vui lòng điền đầy đủ thông tin bắt buộc.'); return; }
+  answers.name  = name;
+  answers.email = email;
+  answers.major = major;
+  goToStep(0);
+}
+
 function hideAllSteps() {
   document.getElementById('step-intro').style.display = 'none';
+  document.getElementById('step-info').classList.remove('active');
   for (let i = 0; i < TOTAL_STEPS; i++) {
     const el = document.getElementById('step-' + i);
     if (el) { el.classList.remove('active'); }
@@ -772,7 +859,7 @@ function nextStep() {
 }
 
 function goBack() {
-  if (currentStep <= 0) showIntro();
+  if (currentStep <= 0) goToInfoStep();
   else goToStep(currentStep - 1);
 }
 
@@ -820,6 +907,9 @@ async function submitSurvey() {
 
   const payload = {
     timestamp: new Date().toLocaleString('vi-VN'),
+    name:         answers.name,
+    email:        answers.email,
+    major:        answers.major,
     q1_tools:     Array.isArray(answers.q0) ? answers.q0.join('; ') : answers.q0,
     q2_frequency: answers.q1,
     q3_barriers:  Array.isArray(answers.q2) ? answers.q2.join('; ') : answers.q2,
